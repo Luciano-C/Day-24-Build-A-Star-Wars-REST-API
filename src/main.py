@@ -5,10 +5,12 @@ import os
 from flask import Flask, request, jsonify, url_for
 from flask_migrate import Migrate
 from flask_swagger import swagger
+# Evita errores de traspaso de información
 from flask_cors import CORS
+# Importado de utils.py, permiten ver html
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User
+from models import db, User, Characters, Characters_Fav
 #from models import Person
 
 app = Flask(__name__)
@@ -38,6 +40,41 @@ def handle_hello():
     }
 
     return jsonify(response_body), 200
+
+@app.route('/characters', methods=["GET"])
+def get_characters():
+    all_characters = Characters.query.all()
+    all_characters = list(map(lambda x: x.serialize(), all_characters))
+    print(all_characters)
+    return jsonify(all_characters), 200
+
+
+@app.route('/characters/<int:id>', methods=['GET'])
+def get_character(id):
+    character = Characters.query.get(id)
+    return jsonify(character.serialize()), 200
+
+
+@app.route('/favorite/characters/<int:id>', methods=['POST'])
+def add_fav_character(id):
+    # Validar si existe personaje
+    character = Characters.query.get(id)
+    if character:
+        check_fav = Characters_Fav.query.filter_by(id_character=id, id_user=1).first()
+        if check_fav:
+            print(check_fav)
+            return "Valor Duplicado"
+        else:
+            favorite = Characters_Fav()
+            favorite.id_character = id
+            favorite.id_user = 1
+            db.session.add(favorite)
+            db.session.commit()
+            return "todo ok"
+    else:
+        return "No existo"
+
+
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
