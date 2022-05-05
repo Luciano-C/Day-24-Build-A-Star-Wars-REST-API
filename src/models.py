@@ -7,6 +7,7 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), unique=False, nullable=False)
     is_active = db.Column(db.Boolean(), unique=False, nullable=False)
+    username = db.Column(db.String(120), unique=True, nullable=False)
 
     def __repr__(self):
         return '<User %r>' % self.username
@@ -85,7 +86,7 @@ class Planets_Fav(db.Model):
         return {
             "id": self.id,
             "id_user": self.id_user,
-            "id_character": self.id_planet 
+            "id_planet": self.id_planet 
         }
     
     rel_user = db.relationship("User")

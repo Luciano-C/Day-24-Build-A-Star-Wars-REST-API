@@ -10,7 +10,7 @@ from flask_cors import CORS
 # Importado de utils.py, permiten ver html
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, Characters, Characters_Fav
+from models import db, User, Characters, Characters_Fav, Planets, Planets_Fav
 #from models import Person
 
 app = Flask(__name__)
@@ -40,7 +40,7 @@ def handle_hello():
     }
 
     return jsonify(response_body), 200
-
+# CHARACTERS
 @app.route('/characters', methods=["GET"])
 def get_characters():
     all_characters = Characters.query.all()
@@ -74,7 +74,36 @@ def add_fav_character(id):
     else:
         return "No existo"
 
+# PLANETS
+@app.route('/planets', methods=["GET"])
+def get_planets():
+    all_planets = Planets.query.all()
+    all_planets = list(map(lambda x: x.serialize(), all_planets))
+    return jsonify(all_planets), 200
 
+@app.route('/planets/<int:id>', methods=['GET'])
+def get_planet(id):
+    planet = Planets.query.get(id)
+    return jsonify(planet.serialize()), 200
+
+@app.route('/favorite/planets/<int:id>', methods=['POST'])
+def add_fav_planet(id):
+    # Validar si existe planeta
+    planet = Planets.query.get(id)
+    if planet:
+        check_fav = Planets_Fav.query.filter_by(id_planet=id, id_user=1).first()
+        if check_fav:
+            print(check_fav)
+            return "Valor Duplicado"
+        else:
+            favorite = Planets_Fav()
+            favorite.id_planet = id
+            favorite.id_user = 1
+            db.session.add(favorite)
+            db.session.commit()
+            return "todo ok"
+    else:
+        return "No existo"
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
