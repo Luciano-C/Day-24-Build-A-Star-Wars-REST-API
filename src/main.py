@@ -89,6 +89,18 @@ def add_fav_character(id, uid):
             return "todo ok"
     else:
         return "No existo"
+    
+@app.route('/user/<int:uid>/favorites/characters/<int:id>', methods=['DELETE'])
+def del_fav_character(id,uid):
+    target = Characters_Fav.query.filter_by(id_character=id, id_user=uid).first()
+    if target:
+        db.session.delete(target)
+        db.session.commit()
+        return "Todo ok"
+    else:
+        return "Character is not favorite"
+
+
 
 # PLANETS
 @app.route('/planets', methods=["GET"])
@@ -121,6 +133,16 @@ def add_fav_planet(id, uid):
     else:
         return "No existo"
 
+@app.route('/user/<int:uid>/favorites/planets/<int:id>', methods=['DELETE'])
+def del_fav_planet(id,uid):
+    target = Planets_Fav.query.filter_by(id_planet=id, id_user=uid).first()
+    if target:
+        db.session.delete(target)
+        db.session.commit()
+        return "Todo ok"
+    else:
+        return "Planet is not favorite"
+
 
 # SHIPS
 @app.route('/ships', methods=["GET"])
@@ -138,7 +160,7 @@ def get_ship(id):
 
 @app.route('/user/<int:uid>/favorites/ships/<int:id>', methods=['POST'])
 def add_fav_ship(id, uid):
-    # Validar si existe planeta
+    # Validar si existe nave
     ship = Ships.query.get(id)
     if ship:
         check_fav = Ships_Fav.query.filter_by(id_ship=id, id_user=uid).first()
@@ -155,7 +177,15 @@ def add_fav_ship(id, uid):
     else:
         return "No existo"
 
-
+@app.route('/user/<int:uid>/favorites/ships/<int:id>', methods=['DELETE'])
+def del_fav_ship(id,uid):
+    target = Ships_Fav.query.filter_by(id_ship=id, id_user=uid).first()
+    if target:
+        db.session.delete(target)
+        db.session.commit()
+        return "Todo ok"
+    else:
+        return "Ship is not favorite"
 
 
 # this only runs if `$ python src/main.py` is executed
